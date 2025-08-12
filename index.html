@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git for Data Engineers - Interactive Tutorial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #667eea;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .card li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .card li::before {
+            content: "▶";
+            color: #667eea;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .command-box {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .command-box::before {
+            content: "Terminal";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .command {
+            color: #68d391;
+            font-weight: bold;
+        }
+
+        .workflow-diagram {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(145deg, #f1f3f4, #e8eaed);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .workflow-step {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            margin: 10px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .workflow-step:hover {
+            transform: scale(1.05);
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #2196f3;
+        }
+
+        .demo-title {
+            color: #1976d2;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .exercise-box {
+            background: linear-gradient(145deg, #fff3e0, #ffe0b2);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 5px solid #ff9800;
+        }
+
+        .exercise-title {
+            color: #f57c00;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .git-logo {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #f1502f;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 200px;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .workflow-step {
+                display: block;
+                margin: 10px 0;
+            }
+            
+            .arrow {
+                display: block;
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="git-logo">Git</span>Git for Data Engineers</h1>
+            <div class="subtitle">Interactive Learning Experience</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showSection('intro')">Introduction</button>
+            <button class="nav-btn" onclick="showSection('basics')">Git Basics</button>
+            <button class="nav-btn" onclick="showSection('workflow')">Workflow</button>
+            <button class="nav-btn" onclick="showSection('branching')">Branching</button>
+            <button class="nav-btn" onclick="showSection('conflicts')">Merge Conflicts</button>
+            <button class="nav-btn" onclick="showSection('commands')">Commands</button>
+            <button class="nav-btn" onclick="showSection('exercises')">Exercises</button>
+        </div>
+
+        <div id="intro" class="section active">
+            <h2>Introduction to Git</h2>
+            <div class="content-grid">
+                <div class="card">
+                    <h3>What is Version Control?</h3>
+                    <ul>
+                        <li>Stores and manages every revision of files and code</li>
+                        <li>Collaborate on source code & manage releases</li>
+                        <li>Roll back to previous versions when bugs are discovered</li>
+                        <li>VSC = Version Control System</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>About Git</h3>
+                    <ul>
+                        <li>Created by Linus Torvalds in 2005 (for the Linux Kernel)</li>
+                        <li>Replaces older VCS tooling (CVS, Subversion, BitKeeper, Mercurial)</li>
+                        <li>Focuses on source code distribution (everyone has a copy)</li>
+                        <li>Implements efficient file storage</li>
+                        <li>Ensures files integrity</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Git Advantages</h3>
+                    <ul>
+                        <li>Distributed development (work on your local copy)</li>
+                        <li>High performance</li>
+                        <li>Ease of use</li>
+                        <li>Strong support for branching and history management</li>
+                        <li>Extensive tooling for advanced operations</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Git Challenges</h3>
+                    <ul>
+                        <li>A new code management model</li>
+                        <li>Learning curve (mind shift & commands)</li>
+                        <li>Destructive operations when used incorrectly</li>
+                        <li>Limited support for binary files</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-title">🚀 VCS Services</div>
+                <div class="content-grid">
+                    <div class="card">
+                        <h3>GitHub</h3>
+                        <ul>
+                            <li>Web-based hosting service for version control using Git</li>
+                            <li>Access control, issue tracking, documentation, automation</li>
+                            <li>Leading VCS service for open-source and enterprises</li>
+                            <li>Acquired by Microsoft in 2018</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Alternatives</h3>
+                        <ul>
+                            <li>GitLab</li>
+                            <li>BitBucket</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="basics" class="section">
+            <h2>Git Basics</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">🔄 The Distributed Model</div>
+                <div class="workflow-diagram">
+                    <div class="workflow-step">Clone Repository</div>
+                    <span class="arrow">→</span>
+                    <div class="workflow-step">Make Local Changes</div>
+                    <span class="arrow">→</span>
+                    <div class="workflow-step">Commit & Push</div>
+                </div>
+                <ul>
+                    <li><strong>Get a copy</strong> of the entire repository from the server ("clone")</li>
+                    <li><strong>All the content</strong> and <strong>all the history</strong></li>
+                    <li><strong>Make changes locally</strong> (commits and branches)</li>
+                    <li><strong>Push changes back</strong> to the server, a.k.a. remote repository</li>
+                </ul>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Git Object Types</h3>
+                    <ul>
+                        <li><strong>Blob:</strong> The raw content of a file – without file metadata</li>
+                        <li><strong>Tree:</strong> One level of directory information (file names, blobs, subdirectories)</li>
+                        <li><strong>Commit:</strong> The version of the tree + metadata (author, dates, log messages, etc.)</li>
+                        <li><strong>Tag:</strong> A label associated with a commit, e.g., a version number</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Delta Storage</h3>
+                    <ul>
+                        <li>Each file is stored as a complete, separate object when introduced</li>
+                        <li>Changes to an existing file are stored as deltas</li>
+                        <li>Git uses a smart and efficient mechanism for storing changes</li>
+                        <li>Results in significant space savings and efficient history management</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="command-box">
+                <div class="command">git init</div> - Initialize a new Git repository<br>
+                <div class="command">git clone &lt;repository_url&gt;</div> - Copy an existing Git repository<br>
+                <div class="command">git add &lt;file&gt;</div> - Stage files (add to the index)<br>
+                <div class="command">git commit -m "Commit message"</div> - Record staged changes<br>
+                <div class="command">git status</div> - Check the status of your working directory
+            </div>
+        </div>
+
+        <div id="workflow" class="section">
+            <h2>Git Workflow and Three Stages</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">📁 The Three Stages</div>
+                <div class="workflow-diagram">
+                    <div class="workflow-step">Working Directory</div>
+                    <span class="arrow">→</span>
+                    <div class="workflow-step">Staging Area (Index)</div>
+                    <span class="arrow">→</span>
+                    <div class="workflow-step">Repository</div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Working Directory</h3>
+                    <ul>
+                        <li>Create, edit, and delete files in your project</li>
+                        <li>Think of it as your "sandbox" where you work on your code and data</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Staging Area (Index)</h3>
+                    <ul>
+                        <li>A checklist of changes you want to commit</li>
+                        <li>Prepare and select specific changes to be included in the next commit</li>
+                        <li>Using git add, you move changes from working directory to staging area</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Repository</h3>
+                    <ul>
+                        <li>The repository stores your project's complete history</li>
+                        <li>When you git commit, the changes in the staging area are recorded as a new snapshot in the repository</li>
+                        <li>Your project's complete history is stored here</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>File States</h3>
+                    <ul>
+                        <li><strong>Untracked:</strong> A new file that is first introduced</li>
+                        <li><strong>Unmodified:</strong> An existing file with no local changes</li>
+                        <li><strong>Modified:</strong> An existing file with local changes</li>
+                        <li><strong>Staged:</strong> Files with local changes marked for the next commit</li>
+                        <li><strong>Committed:</strong> Changes safely stored in the local database</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="workflow-diagram">
+                <h3>Basic Git Workflow</h3>
+                <div class="workflow-step">Make changes to files</div>
+                <span class="arrow">→</span>
+                <div class="workflow-step">git add</div>
+                <span class="arrow">→</span>
+                <div class="workflow-step">git commit</div>
+                <span class="arrow">→</span>
+                <div class="workflow-step">git push</div>
+            </div>
+        </div>
+
+        <div id="branching" class="section">
+            <h2>Git Branches</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">🌳 Branching Strategy</div>
+                <ul>
+                    <li>Treat the source code as a tree of branches</li>
+                    <li>Each branch is a linear set of commits</li>
+                    <li>Use a side branch to work on a private version of the code</li>
+                    <li>Merge the side branch back into the main branch</li>
+                    <li>Collaborate with other developers</li>
+                </ul>
+            </div>
+
+            <div class="command-box">
+                <div class="command">git checkout branch_name</div> - Switch to branch<br>
+                <div class="command">git checkout -B branch_name</div> - Create and switch to new branch<br>
+                <div class="command">git branch -D testing</div> - Delete branch<br>
+                <div class="command">git log --oneline --decorate --graph --all</div> - View all branches<br>
+                <div class="command">git show branch_name</div> - Show branch head
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Merge Branches</h3>
+                    <ul>
+                        <li>Once ready, a side branch is merged into the main branch</li>
+                        <li>Switch to the main branch: <code>git checkout main</code></li>
+                        <li>Merge the side branch: <code>git merge side_branch</code></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Divergent History</h3>
+                    <ul>
+                        <li>Collaborating using multiple branches may lead to divergent history</li>
+                        <li>Developer #1 starts a new branch and changes a file</li>
+                        <li>Developer #2 adds a new commit to the main branch and also changes the same file</li>
+                        <li>Developer #1 cannot merge because the changes conflict</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="conflicts" class="section">
+            <h2>Merge Conflicts</h2>
+            
+            <div class="interactive-demo">
+                <div class="demo-title">⚡ Facing Conflicts</div>
+                <ul>
+                    <li>When a merge conflict emerges, the merge is paused to let you resolve it</li>
+                    <li>Use git status to see which files have conflicts</li>
+                    <li>Files without conflicts are staged</li>
+                    <li>Files with conflicts appear as "Both modified"</li>
+                </ul>
+            </div>
+
+            <div class="command-box">
+                <strong>Conflict Example:</strong><br>
+                &lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD<br>
+                <span style="color: #68d391;">new text on main</span><br>
+                =======<br>
+                <span style="color: #ffa726;">text from side branch</span><br>
+                &gt;&gt;&gt;&gt;&gt;&gt;&gt; my_side_branch
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Resolving Conflicts Manually</h3>
+                    <ul>
+                        <li>Open the file that has conflicts</li>
+                        <li>Delete/Change irrelevant lines</li>
+                        <li>Stage the file (git add)</li>
+                        <li>To finish the merge when all conflicts are resolved: <code>git merge --continue</code></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Resolving With Style</h3>
+                    <ul>
+                        <li>Modern IDE viewing and resolving merge conflicts (e.g., VSCode)</li>
+                        <li>Using a merge editor is the better practice</li>
+                        <li>See the changes more clearly</li>
+                        <li>Easily choose the preferred version</li>
+                        <li>Combine code from both branches</li>
+                        <li>More intuitive and human-friendly interface</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <div class="exercise-title">🔧 VSCode Merge Example</div>
+                <ol>
+                    <li>Open the file in conflict</li>
+                    <li>Press "Resolve in Merge Editor"</li>
+                    <li>Compare the changes and resolve the conflict</li>
+                    <li>Choose "Accept Incoming" to select changes from the side branch</li>
+                    <li>Choose "Accept Current" to select changes from the main branch</li>
+                    <li>Manually update the result if needed</li>
+                    <li>Once ready, press "Complete Merge" to stage the file</li>
+                    <li>Run <code>git merge --continue</code> or use VSCode to finish</li>
+                </ol>
+            </div>
+        </div>
+
+        <div id="commands" class="section">
+            <h2>Essential Git Commands</h2>
+            
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Repository Management</h3>
+                    <div class="command-box">
+                        <div class="command">git init</div> - Create a new local repository<br>
+                        <div class="command">git clone</div> - Download a copy of a remote repository<br>
+                        <div class="command">git status</div> - Show the status (index) of the working directory
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Staging & Committing</h3>
+                    <div class="command-box">
+                        <div class="command">git add</div> - Stage files (add to the index)<br>
+                        <div class="command">git reset</div> - Unstage files (remove from the index)<br>
+                        <div class="command">git commit</div> - Create a new commit (changeset) in your local repository
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <h3>Branching</h3>
+                    <div class="command-box">
+                        <div class="command">git checkout</div> - Set your working directory to work on a different commit, tag or branch<br>
+                        <div class="command">git log</div> - View the history of your local repository (commits)<br>
+                        <div class="command">git diff</div> - Compare versions (local changes, staged changes, different commits, etc.)
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Remote Operations</h3>
+                    <div class="command-box">
+                        <div class="command">git fetch</div> - Bring info (commits, branches) from the remote repository<br>
+                        <div class="command">git pull</div> - Fetch and checkout the latest commit of your current branch
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="exercises" class="section">
+            <h2>Practice Exercises</h2>
+            
+            <div class="exercise-box">
+                <div class="exercise-title">🎯 Exercise #1: Git Intro</div>
+                <p>Complete the following tutorial from the official git book:</p>
+                <a href="https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository" target="_blank" style="color: #667eea; text-decoration: none; font-weight: bold;">
+                    Git Basics - Getting a Git Repository →
+                </a>
+            </div>
+
+            <div class="exercise-box">
+                <div class="exercise-title">🎯 Local Exercise - Part #1</div>
+                <ol>
+                    <li>Initialize a new repository</li>
+                    <li>Create a file called "name.txt" with your name</li>
+                    <li>Stage the file</li>
+                    <li>Create a new commit</li>
+                </ol>
+                <div class="command-box">
+                    <div class="command">git init</div><br>
+                    <div class="command">echo "Your Name" > name.txt</div><br>
+                    <div class="command">git add name.txt</div><br>
+                    <div class="command">git commit -m "Add name file"</div>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <div class="exercise-title">🎯 Local Exercise - Part #2</div>
+                <ol>
+                    <li>Create a new branch called "side_branch"</li>
+                    <li>Change the content of name.txt to the name of the person next to you</li>
+                    <li>Stage and commit the changes</li>
+                    <li>Observe your work using: git log, git status, git show</li>
+                </ol>
+                <div class="command-box">
+                    <div class="command">git checkout -b side_branch</div><br>
+                    <div class="command">echo "Another Name" > name.txt</div><br>
+                    <div class="command">git add name.txt</div><br>
+                    <div class="command">git commit -m "Update name"</div>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <div class="exercise-title">🎯 Local Exercise - Part #3</div>
+                <ol>
+                    <li>Check out the main branch</li>
+                    <li>Merge "side_branch" into the main branch</li>
+                    <li>Resolve the conflict so that both names appear in "name.txt"</li>
+                    <li>Once the conflict is resolved, complete the merge</li>
+                    <li>Observe the complete git tree using git log</li>
+                </ol>
+                <div class="command-box">
+                    <div class="command">git checkout main</div><br>
+                    <div class="command">git merge side_branch</div><br>
+                    <span style="color: #ffa726;"># Resolve conflicts in name.txt</span><br>
+                    <div class="command">git add name.txt</div><br>
+                    <div class="command">git merge --continue</div>
+                </div>
+            </div>
+
+            <div class="exercise-box">
+                <div class="exercise-title">🎯 Git Tutorial Exercise</div>
+                <p>Play "learn git branching": <a href="https://learngitbranching.js.org/" target="_blank" style="color: #667eea;">learngitbranching.js.org →</a></p>
+                <ul>
+                    <li><strong>Main</strong> → Introduction to git commit → 1, 2, 3</li>
+                    <li><strong>Remote</strong> → Faking Teamwork → 1, 3, 4, 5, 6</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 'intro';
+        let completedSections = new Set(['intro']);
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update navigation
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Track progress
+            completedSections.add(sectionId);
+            currentSection = sectionId;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalSections = 7;
+            const progress = (completedSections.size / totalSections) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // Initialize progress
+        updateProgress();
+
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Add click animations to workflow steps
+            const workflowSteps = document.querySelectorAll('.workflow-step');
+            workflowSteps.forEach(step => {
+                step.addEventListener('click', function() {
+                    this.style.animation = 'pulse 0.6s ease-in-out';
+                    setTimeout(() => {
+                        this.style.animation = '';
+                    }, 600);
+                });
+            });
+
+            // Add copy functionality to command boxes
+            const commandBoxes = document.querySelectorAll('.command-box');
+            commandBoxes.forEach(box => {
+                box.addEventListener('click', function() {
+                    const commands = this.innerText;
+                    navigator.clipboard.writeText(commands).then(() => {
+                        // Show feedback
+                        const originalBg = this.style.backgroundColor;
+                        this.style.backgroundColor = '#4a5568';
+                        this.style.border = '2px solid #68d391';
+                        setTimeout(() => {
+                            this.style.backgroundColor = originalBg;
+                            this.style.border = '';
+                        }, 1000);
+                    });
+                });
+            });
+        });
+
+        // Add pulse animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
+            }
+            
+            .command-box:hover {
+                cursor: pointer;
+                border: 1px solid #68d391;
+                box-shadow: 0 4px 15px rgba(104, 211, 145, 0.3);
+            }
+            
+            .command-box:hover::after {
+                content: "Click to copy commands";
+                position: absolute;
+                top: -35px;
+                right: 15px;
+                background: #68d391;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 12px;
+                font-family: 'Segoe UI', sans-serif;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const sections = ['intro', 'basics', 'workflow', 'branching', 'conflicts', 'commands', 'exercises'];
+            const currentIndex = sections.indexOf(currentSection);
+            
+            if (e.key === 'ArrowRight' && currentIndex < sections.length - 1) {
+                const nextSection = sections[currentIndex + 1];
+                showSectionProgrammatically(nextSection);
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                const prevSection = sections[currentIndex - 1];
+                showSectionProgrammatically(prevSection);
+            }
+        });
+
+        function showSectionProgrammatically(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update navigation
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => btn.classList.remove('active'));
+            
+            // Find and activate the correct button
+            const buttons = document.querySelectorAll('.nav-btn');
+            const sectionOrder = ['intro', 'basics', 'workflow', 'branching', 'conflicts', 'commands', 'exercises'];
+            const buttonIndex = sectionOrder.indexOf(sectionId);
+            if (buttonIndex >= 0) {
+                buttons[buttonIndex].classList.add('active');
+            }
+
+            // Track progress
+            completedSections.add(sectionId);
+            currentSection = sectionId;
+            updateProgress();
+        }
+    </script>
+</body>
+</html>
