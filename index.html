@@ -154,9 +154,12 @@
             background: #2d3748;
             color: #e2e8f0;
             border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
+            padding: 30px;              /* הגדל מ-20px ל-30px */
+            margin: 30px 0;             /* הגדל מ-20px ל-30px */
             font-family: 'Courier New', monospace;
+            font-size: 16px;            /* הוסף - הגדל גודל טקסט */
+            line-height: 1.8;           /* הוסף - הגדל מרווח בין שורות */
+            min-height: 150px;          /* הוסף - גובה מינימלי */
             position: relative;
             overflow-x: auto;
         }
@@ -788,7 +791,7 @@
                         setTimeout(() => {
                             this.style.backgroundColor = originalBg;
                             this.style.border = '';
-                        }, 1200);
+                        }, 1000);
                     });
                 });
             });
