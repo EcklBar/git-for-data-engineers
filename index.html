@@ -615,6 +615,21 @@
                 </ol>
             </div>
         </div>
+        <div class="card">
+            <h3>Rebasing</h3>
+            <div class="command-box">
+                <div class="command">git rebase -i master</div> - Interactively rebase the current branch onto <code>master</code>, allowing you to edit, combine, or remove commits.<br>
+                <pre>
+                p, pick   = use commit as is
+                r, reword = use commit, but edit the commit message
+                e, edit   = use commit, but pause for amending
+                s, squash = combine commit into the previous one (keep both messages)
+                f, fixup  = combine commit into the previous one (discard this commit's message)
+                x, exec   = run shell command during rebase
+                d, drop   = remove commit entirely
+                </pre>
+            </div>
+        </div>
 
 <div id="commands" class="section">
     <h2>Essential Git Commands</h2>
@@ -690,21 +705,6 @@
                 <div class="command">git reset HEAD &lt;file&gt;</div> - Unstage a specific file<br>
                 <div class="command">git reset --soft HEAD~1</div> - Undo last commit, keep changes staged<br>
                 <div class="command">git reset --hard HEAD~1</div> - Undo last commit and discard changes
-            </div>
-        </div>
-        <div class="card">
-            <h3>Rebasing</h3>
-            <div class="command-box">
-                <div class="command">git rebase -i master</div> - Interactively rebase the current branch onto <code>master</code>, allowing you to edit, combine, or remove commits.<br>
-                <pre>
-                p, pick   = use commit as is
-                r, reword = use commit, but edit the commit message
-                e, edit   = use commit, but pause for amending
-                s, squash = combine commit into the previous one (keep both messages)
-                f, fixup  = combine commit into the previous one (discard this commit's message)
-                x, exec   = run shell command during rebase
-                d, drop   = remove commit entirely
-                </pre>
             </div>
         </div>
     </div>
