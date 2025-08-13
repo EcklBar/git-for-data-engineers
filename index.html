@@ -619,15 +619,15 @@
             <h3>Rebasing</h3>
             <div class="command-box">
                 <div class="command">git rebase -i master</div> - Interactively rebase the current branch onto <code>master</code>, allowing you to edit, combine, or remove commits.<br>
-                <pre>
-                p, pick   = use commit as is
-                r, reword = use commit, but edit the commit message
-                e, edit   = use commit, but pause for amending
-                s, squash = combine commit into the previous one (keep both messages)
-                f, fixup  = combine commit into the previous one (discard this commit's message)
-                x, exec   = run shell command during rebase
-                d, drop   = remove commit entirely
-                </pre>
+                <ol>
+                <li>p, pick   = use commit as is</li>
+                <li>r, reword = use commit, but edit the commit message</li>
+                <li>e, edit   = use commit, but pause for amending</li>
+                <li>s, squash = combine commit into the previous one (keep both messages)</li>
+                <li>f, fixup  = combine commit into the previous one (discard this commit's message)</li>
+                <li>x, exec   = run shell command during rebase</li>
+                <li>d, drop   = remove commit entirely</li>
+                </ol>
             </div>
         </div>
 
