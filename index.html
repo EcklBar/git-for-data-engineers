@@ -312,7 +312,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><span class="git-logo">Git</span></h1>
+            <h1><span class="git-logo">Git</span>Git</h1>
             <div class="subtitle">Interactive Learning Experience</div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressBar"></div>
@@ -676,8 +676,10 @@
             <div class="command-box">
                 <div class="command">git log</div> - View the history of your local repository (commits)<br>
                 <div class="command">git log --oneline</div> - Compact commit history<br>
+                <div class="command">git log --since="YYYY-MM-DD" --until="YYYY-MM-DD"</div> - Compact commit history<br>
                 <div class="command">git show &lt;commit&gt;</div> - Show details of a specific commit<br>
                 <div class="command">git diff</div> - Compare versions (local changes, staged changes, different commits, etc.)<br>
+                <div class="command">git diff --staged</div> - Compare all staged files to versions in the last commit<br>
                 <div class="command">git blame &lt;file&gt;</div> - Show who modified each line in a file<br>
                 <div class="command">git tag &lt;tag-name&gt;</div> - Create a local tag for the current commit to mark an important version in history
             </div>
@@ -686,7 +688,11 @@
             <h3>Undoing Changes</h3>
             <div class="command-box">
                 <div class="command">git checkout &lt;file&gt;</div> - Restore file to last committed state<br>
-                <div class="command">git revert &lt;commit&gt;</div> - Create a new commit that undoes changes<br>
+                <div class="command">git revert &lt;commit&gt;</div> - Revert all files from a given commit<br>
+                <div class="command">git revert &lt;commit&gt; --no-edit</div> - Revert without opening a text editor<br>
+                <div class="command">git revert &lt;commit&gt; -n</div> - Revert without making a new commit<br>
+                <div class="command">git restore --satged report.md</div> - Remove a single file from the staging area<br>
+                <div class="command">git restore --satged</div> - Remove all files from the staging area<br>
                 <div class="command">git reset HEAD &lt;file&gt;</div> - Unstage a specific file<br>
                 <div class="command">git reset --soft HEAD~1</div> - Undo last commit, keep changes staged<br>
                 <div class="command">git reset --hard HEAD~1</div> - Undo last commit and discard changes
