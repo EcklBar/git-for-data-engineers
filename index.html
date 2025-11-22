@@ -325,6 +325,7 @@
             <button class="nav-btn" onclick="showSection('workflow')">Workflow</button>
             <button class="nav-btn" onclick="showSection('branching')">Branching</button>
             <button class="nav-btn" onclick="showSection('conflicts')">Merge Conflicts</button>
+            <button class="nav-btn" onclick="showSection('visualization')">Merge Visualization</button>
             <button class="nav-btn" onclick="showSection('commands')">Commands</button>
             <button class="nav-btn" onclick="showSection('exercises')">Exercises</button>
         </div>
@@ -615,30 +616,306 @@
                 </ol>
             </div>
         </div>
+    </div>
+
+<div id="visualization" class="section">
+    <h2>Types of Git Merge</h2>
+    
+    <div class="interactive-demo">
+        <div class="demo-title">🔀 Interactive Merge Visualization</div>
+        <p>Click on different merge types to see how they work visually and learn the commands.</p>
+    </div>
+
+    <div style="background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 20px; margin: 20px 0; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;">
+            <button class="merge-btn active" onclick="showMergeType('fast-forward')" style="background: rgba(102, 126, 234, 0.9); color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">Fast-Forward</button>
+            <button class="merge-btn" onclick="showMergeType('recursive')" style="background: rgba(255, 255, 255, 0.9); color: #4a5568; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">Recursive</button>
+            <button class="merge-btn" onclick="showMergeType('squash')" style="background: rgba(255, 255, 255, 0.9); color: #4a5568; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">Squash</button>
+            <button class="merge-btn" onclick="showMergeType('octopus')" style="background: rgba(255, 255, 255, 0.9); color: #4a5568; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">Octopus</button>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(45deg, #3498db, #2980b9);"></div>
+                <span>Main Branch</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(45deg, #e74c3c, #c0392b);"></div>
+                <span>Feature Branch</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: white; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(45deg, #f39c12, #e67e22);"></div>
+                <span>Merge Commit</span>
+            </div>
+        </div>
+
+        <div id="git-graph" style="width: 100%; max-width: 800px; height: 400px; position: relative; background: #f8f9fa; border-radius: 10px; border: 2px solid #dee2e6; overflow: hidden; margin: 0 auto;">
+            <!-- Graph will be rendered here -->
+        </div>
+
+        <div id="merge-description" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea;">
+            <!-- Description will be rendered here -->
+        </div>
+    </div>
+
+    <script>
+        const mergeVisualizationTypes = {
+            'fast-forward': {
+                title: 'Fast-Forward Merge',
+                description: 'Occurs when the target branch hasn\'t changed since the feature branch was created. Git simply moves the pointer forward along the same line.',
+                benefits: [
+                    'Creates a clean, linear history',
+                    'No unnecessary merge commits',
+                    'Simple to understand and follow'
+                ],
+                commands: [
+                    'git checkout main',
+                    'git merge feature-branch',
+                    '# Or force fast-forward only',
+                    'git merge --ff-only feature-branch'
+                ],
+                commits: [
+                    { id: 'A', x: 100, y: 200, type: 'main', label: 'A' },
+                    { id: 'B', x: 200, y: 200, type: 'main', label: 'B' },
+                    { id: 'C', x: 300, y: 200, type: 'feature', label: 'C' },
+                    { id: 'D', x: 400, y: 200, type: 'feature', label: 'D' }
+                ],
+                lines: [
+                    { from: { x: 140, y: 200 }, to: { x: 160, y: 200 }, type: 'main' },
+                    { from: { x: 240, y: 200 }, to: { x: 260, y: 200 }, type: 'main' },
+                    { from: { x: 340, y: 200 }, to: { x: 360, y: 200 }, type: 'main' }
+                ]
+            },
+            'recursive': {
+                title: 'Recursive Merge',
+                description: 'The most common merge strategy. Used when both branches have diverged. Creates a new merge commit that combines changes from both branches.',
+                benefits: [
+                    'Preserves complete history of both branches',
+                    'Automatically handles simple conflicts',
+                    'Shows clearly where changes came from'
+                ],
+                commands: [
+                    'git checkout main',
+                    'git merge feature-branch',
+                    '# Creates a merge commit automatically',
+                    '# Resolve conflicts if they occur'
+                ],
+                commits: [
+                    { id: 'A', x: 100, y: 200, type: 'main', label: 'A' },
+                    { id: 'B', x: 200, y: 200, type: 'main', label: 'B' },
+                    { id: 'C', x: 300, y: 150, type: 'feature', label: 'C' },
+                    { id: 'D', x: 400, y: 150, type: 'feature', label: 'D' },
+                    { id: 'E', x: 300, y: 250, type: 'main', label: 'E' },
+                    { id: 'M', x: 500, y: 200, type: 'merge', label: 'M' }
+                ],
+                lines: [
+                    { from: { x: 140, y: 200 }, to: { x: 160, y: 200 }, type: 'main' },
+                    { from: { x: 240, y: 200 }, to: { x: 260, y: 175 }, type: 'feature' },
+                    { from: { x: 240, y: 200 }, to: { x: 260, y: 225 }, type: 'main' },
+                    { from: { x: 340, y: 150 }, to: { x: 360, y: 150 }, type: 'feature' },
+                    { from: { x: 340, y: 250 }, to: { x: 450, y: 225 }, type: 'main' },
+                    { from: { x: 440, y: 150 }, to: { x: 450, y: 175 }, type: 'feature' }
+                ]
+            },
+            'squash': {
+                title: 'Squash Merge',
+                description: 'Takes all commits from the feature branch and creates a single new commit on the target branch. The feature branch history is not preserved.',
+                benefits: [
+                    'Creates very clean, linear history',
+                    'Hides intermediate development commits',
+                    'Perfect for small features or bug fixes'
+                ],
+                commands: [
+                    'git checkout main',
+                    'git merge --squash feature-branch',
+                    'git commit -m "Complete feature (squashed)"',
+                    '# All changes combined into one commit'
+                ],
+                commits: [
+                    { id: 'A', x: 100, y: 200, type: 'main', label: 'A' },
+                    { id: 'B', x: 200, y: 200, type: 'main', label: 'B' },
+                    { id: 'C', x: 300, y: 150, type: 'feature', label: 'C', opacity: 0.5 },
+                    { id: 'D', x: 400, y: 150, type: 'feature', label: 'D', opacity: 0.5 },
+                    { id: 'S', x: 300, y: 200, type: 'main', label: 'S' }
+                ],
+                lines: [
+                    { from: { x: 140, y: 200 }, to: { x: 160, y: 200 }, type: 'main' },
+                    { from: { x: 240, y: 200 }, to: { x: 260, y: 200 }, type: 'main' },
+                    { from: { x: 240, y: 200 }, to: { x: 260, y: 175 }, type: 'feature', opacity: 0.3 },
+                    { from: { x: 340, y: 150 }, to: { x: 360, y: 150 }, type: 'feature', opacity: 0.3 }
+                ]
+            },
+            'octopus': {
+                title: 'Octopus Merge',
+                description: 'Allows merging more than two branches in a single operation. Rarely used and requires that there are no conflicts.',
+                benefits: [
+                    'Can merge multiple branches at once',
+                    'Reduces number of merge commits',
+                    'Useful for integrating several small features'
+                ],
+                commands: [
+                    'git checkout main',
+                    'git merge feature1 feature2 feature3',
+                    '# Or explicitly use octopus strategy',
+                    'git merge -s octopus feature1 feature2 feature3'
+                ],
+                commits: [
+                    { id: 'A', x: 100, y: 200, type: 'main', label: 'A' },
+                    { id: 'B', x: 250, y: 120, type: 'feature', label: 'B' },
+                    { id: 'C', x: 250, y: 200, type: 'feature', label: 'C' },
+                    { id: 'D', x: 250, y: 280, type: 'feature', label: 'D' },
+                    { id: 'M', x: 400, y: 200, type: 'merge', label: 'M' }
+                ],
+                lines: [
+                    { from: { x: 140, y: 200 }, to: { x: 350, y: 175 }, type: 'main' },
+                    { from: { x: 140, y: 200 }, to: { x: 210, y: 140 }, type: 'feature' },
+                    { from: { x: 140, y: 200 }, to: { x: 210, y: 200 }, type: 'feature' },
+                    { from: { x: 140, y: 200 }, to: { x: 210, y: 260 }, type: 'feature' },
+                    { from: { x: 290, y: 120 }, to: { x: 350, y: 175 }, type: 'feature' },
+                    { from: { x: 290, y: 200 }, to: { x: 350, y: 200 }, type: 'feature' },
+                    { from: { x: 290, y: 280 }, to: { x: 350, y: 225 }, type: 'feature' }
+                ]
+            }
+        };
+
+        function showMergeType(type) {
+            // Update buttons
+            document.querySelectorAll('.merge-btn').forEach(btn => {
+                btn.style.background = 'rgba(255, 255, 255, 0.9)';
+                btn.style.color = '#4a5568';
+            });
+            event.target.style.background = 'rgba(102, 126, 234, 0.9)';
+            event.target.style.color = 'white';
+
+            const merge = mergeVisualizationTypes[type];
+            const graph = document.getElementById('git-graph');
+            const description = document.getElementById('merge-description');
+
+            // Clear graph
+            graph.innerHTML = '';
+
+            // Add commits
+            merge.commits.forEach(commit => {
+                const commitEl = document.createElement('div');
+                commitEl.style.cssText = `
+                    width: 40px; height: 40px; border-radius: 50%; position: absolute;
+                    display: flex; align-items: center; justify-content: center;
+                    font-weight: bold; font-size: 14px; color: white;
+                    transition: all 0.5s ease; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                    left: ${commit.x}px; top: ${commit.y}px;
+                `;
+                
+                if (commit.type === 'main') {
+                    commitEl.style.background = 'linear-gradient(45deg, #3498db, #2980b9)';
+                } else if (commit.type === 'feature') {
+                    commitEl.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)';
+                } else if (commit.type === 'merge') {
+                    commitEl.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)';
+                    commitEl.style.width = '50px';
+                    commitEl.style.height = '50px';
+                }
+                
+                if (commit.opacity) {
+                    commitEl.style.opacity = commit.opacity;
+                }
+                
+                commitEl.textContent = commit.label;
+                graph.appendChild(commitEl);
+            });
+
+            // Add lines
+            merge.lines.forEach(line => {
+                const lineEl = document.createElement('div');
+                
+                const deltaX = line.to.x - line.from.x;
+                const deltaY = line.to.y - line.from.y;
+                const length = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+
+                lineEl.style.cssText = `
+                    position: absolute; height: 4px; border-radius: 2px;
+                    transition: all 0.5s ease;
+                    left: ${line.from.x}px; top: ${line.from.y - 2}px;
+                    width: ${length}px; transform: rotate(${angle}deg);
+                    transform-origin: 0 50%;
+                `;
+                
+                if (line.type === 'main') {
+                    lineEl.style.background = 'linear-gradient(90deg, #3498db, #2980b9)';
+                } else if (line.type === 'feature') {
+                    lineEl.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+                } else if (line.type === 'merge') {
+                    lineEl.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
+                } else {
+                    lineEl.style.background = 'linear-gradient(90deg, #bdc3c7, #95a5a6)';
+                }
+                
+                if (line.opacity) {
+                    lineEl.style.opacity = line.opacity;
+                }
+                
+                graph.appendChild(lineEl);
+            });
+
+            // Update description
+            description.innerHTML = `
+                <h3 style="color: #2c3e50; margin-bottom: 15px; font-size: 1.5rem;">${merge.title}</h3>
+                <p style="line-height: 1.6; margin-bottom: 15px; font-size: 1.1rem;">${merge.description}</p>
+                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60; margin: 15px 0;">
+                    <h4 style="color: #27ae60; margin-bottom: 10px;">Benefits</h4>
+                    <ul style="margin-left: 20px;">
+                        ${merge.benefits.map(benefit => `<li style="margin-bottom: 5px; color: #2c3e50;">${benefit}</li>`).join('')}
+                    </ul>
+                </div>
+                <div style="background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 8px; margin-top: 20px; font-family: 'Courier New', monospace;">
+                    <h4 style="color: #f39c12; margin-bottom: 15px; font-size: 1.2rem;">Commands</h4>
+                    ${merge.commands.map(cmd => {
+                        if (cmd.startsWith('#')) {
+                            return `<div style="color: #95a5a6; font-style: italic;">${cmd}</div>`;
+                        } else if (cmd.startsWith('git')) {
+                            return `<div style="color: #2ecc71; font-weight: bold;">${cmd}</div>`;
+                        } else {
+                            return `<div>${cmd}</div>`;
+                        }
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // Show fast-forward by default when the page loads
+        if (typeof showMergeType === 'function') {
+            setTimeout(() => showMergeType('fast-forward'), 100);
+        }
+    </script>
+    </div>
+</div>
 
 <div id="commands" class="section">
     <h2>Essential Git Commands</h2>
-
+    
     <div class="content-grid">
         <div class="card">
             <h3>Repository Management</h3>
             <div class="command-box">
                 <div class="command">git init</div> - Create a new local repository<br>
                 <div class="command">git clone</div> - Download a copy of a remote repository<br>
-                <div class="command">git status</div> - Show the status (index) of the working directory<br>
-                <div class="command">git remote -v</div> - List all remote repositories<br>
-                <div class="command">git remote add origin &lt;url&gt;</div> - Add a new remote repository
+                <div class="command">git status</div> - Show the status of the working directory<br>
+                <div class="command">git remote -v</div> - List all remote repositories including their URL(s).<br>
+                <div class="command">git remote</div> - List all remote repositories<br>
+                <div class="command">git remote add origin &lt;url&gt;</div> - Add a new remote repository<br>
+                <div class="command">git remote add new_name &lt;path&gt;</div> - Add a new name for the remote repository
             </div>
         </div>
         <div class="card">
             <h3>Staging & Committing</h3>
             <div class="command-box">
-                <div class="command">git add</div> - Stage files (add to the index)<br>
+                <div class="command">git add &lt;file&gt;</div> - Stage a specific file<br>
                 <div class="command">git add .</div> - Stage all changes in the current directory<br>
-                <div class="command">git reset</div> - Unstage files (remove from the index)<br>
-                <div class="command">git restore --staged &lt;file&gt;</div> - Remove file from staging (same as reset for that file)<br>
-                <div class="command">git reset --hard</div> - Reset working directory to last commit<br>
-                <div class="command">git commit</div> - Create a new commit (changeset) in your local repository<br>
+                <div class="command">git restore --staged &lt;file&gt;</div> - Remove a file from staging (same as reset for that file)<br>
+                <div class="command">git restore --staged</div> - Remove all files from staging<br>
+                <div class="command">git reset</div> - Unstage files<br>
+                <div class="command">git reset --hard</div> - Reset working directory to the last commit<br>
+                <div class="command">git commit</div> - Create a new commit (changeset) in the local repository<br>
                 <div class="command">git commit -m "message"</div> - Commit with an inline message
             </div>
         </div>
@@ -650,22 +927,26 @@
             <div class="command-box">
                 <div class="command">git branch</div> - List all branches<br>
                 <div class="command">git branch &lt;name&gt;</div> - Create a new branch<br>
-                <div class="command">git branch -d &lt;name&gt;</div> - Delete a local branch (will prevent deletion if there are unmerged changes)<br>
+                <div class="command">git branch -d &lt;name&gt;</div> - Delete a local branch (prevents deletion if there are unmerged changes)<br>
                 <div class="command">git branch -D &lt;name&gt;</div> - Force delete a local branch (even if there are unmerged changes)<br>
+                <div class="command">git branch -m old_name new_name</div> - Renameing a branch<br>
                 <div class="command">git checkout &lt;branch&gt;</div> - Switch to a different branch<br>
                 <div class="command">git checkout -b &lt;name&gt;</div> - Create and switch to a new branch (fails if branch exists)<br>
                 <div class="command">git checkout -B &lt;name&gt;</div> - Create or reset an existing branch to the current HEAD<br>
-                <div class="command">git merge &lt;branch&gt;</div> - Merge branch into the current branch
+                <div class="command">git merge &lt;branch&gt;</div> - Merge a branch into the current branch<br>
+                <div class="command">git merge &lt;branch&gt; --ff-only</div> - Merge only if fast-forward is possible<br>
+                <div class="command">git merge --no-ff &lt;branch&gt;</div> - Always create a merge commit, even if fast-forward is possible<br>
+                <div class="command">git merge --squash &lt;branch&gt;</div> - Combine all commits from the branch into a single commit without creating a merge commit<br>
+                <div class="command">git merge -s octopus &lt;branch1&gt; &lt;branch2&gt; ...</div> - Merge multiple branches into the current branch with a single merge commit
             </div>
         </div>
         <div class="card">
-            <h3>Remote Operations</h3>
+            <h3>Cherry-pick</h3>
             <div class="command-box">
-                <div class="command">git fetch</div> - Bring information (commits, branches) from the remote repository<br>
-                <div class="command">git pull</div> - Fetch and checkout the latest commit of your current branch<br>
-                <div class="command">git push</div> - Upload your commits to the remote repository<br>
-                <div class="command">git push origin &lt;branch&gt;</div> - Push a specific branch to the remote<br>
-                <div class="command">git push -u origin &lt;branch&gt;</div> - Push and set upstream branch
+                <div class="command">git cherry-pick &lt;commit-hash&gt;</div> - Apply a commit from another branch<br>
+                <div class="command">git cherry-pick &lt;hash1&gt; &lt;hash2&gt;</div> - Apply multiple commits<br>
+                <div class="command">git cherry-pick --continue</div> - Continue after resolving conflicts<br>
+                <div class="command">git cherry-pick --abort</div> - Cancel cherry-pick process<br>
             </div>
         </div>
     </div>
@@ -674,51 +955,108 @@
         <div class="card">
             <h3>History & Information</h3>
             <div class="command-box">
-                <div class="command">git log</div> - View the history of your local repository (commits)<br>
+                <div class="command">git log</div> - View the history of commits in the local repository<br>
                 <div class="command">git log --oneline</div> - Compact commit history<br>
-                <div class="command">git log --since="YYYY-MM-DD" --until="YYYY-MM-DD"</div> - Compact commit history<br>
+                <div class="command">git log --oneline --graph --all</div> - Compact commit history with a visual graph of all branches<br>
+                <div class="command">git log --since="YYYY-MM-DD" --until="YYYY-MM-DD"</div> - View commit history within a date range<br>
                 <div class="command">git show &lt;commit&gt;</div> - Show details of a specific commit<br>
-                <div class="command">git diff</div> - Compare versions (local changes, staged changes, different commits, etc.)<br>
-                <div class="command">git diff --staged</div> - Compare all staged files to versions in the last commit<br>
+                <div class="command">git diff</div> - Compare changes (local, staged, or between commits)<br>
+                <div class="command">git diff --staged</div> - Compare staged files to the last commit<br>
                 <div class="command">git blame &lt;file&gt;</div> - Show who modified each line in a file<br>
-                <div class="command">git tag &lt;tag-name&gt;</div> - Create a local tag for the current commit to mark an important version in history
+                <div class="command">git tag &lt;tag-name&gt;</div> - Create a local tag for the current commit to mark an important version
             </div>
         </div>
         <div class="card">
             <h3>Undoing Changes</h3>
             <div class="command-box">
-                <div class="command">git checkout &lt;file&gt;</div> - Restore file to last committed state<br>
-                <div class="command">git revert &lt;commit&gt;</div> - Revert all files from a given commit<br>
+                <div class="command">git checkout &lt;file&gt;</div> - Restore a file to its last committed state<br>
+                <div class="command">git revert &lt;commit&gt;</div> - Create a new commit that reverts changes from a specific commit<br>
                 <div class="command">git revert &lt;commit&gt; --no-edit</div> - Revert without opening a text editor<br>
-                <div class="command">git revert &lt;commit&gt; -n</div> - Revert without making a new commit<br>
-                <div class="command">git restore --satged report.md</div> - Remove a single file from the staging area<br>
-                <div class="command">git restore --satged</div> - Remove all files from the staging area<br>
+                <div class="command">git revert &lt;commit&gt; -n</div> - Revert without creating a new commit<br>
                 <div class="command">git reset HEAD &lt;file&gt;</div> - Unstage a specific file<br>
-                <div class="command">git reset --soft HEAD~1</div> - Undo last commit, keep changes staged<br>
+                <div class="command">git reset --soft HEAD~1</div> - Undo last commit but keep changes staged<br>
+                <div class="command">git reset --mixed HEAD~1</div> - Undo last commit, keep changes in working directory but unstaged<br>
                 <div class="command">git reset --hard HEAD~1</div> - Undo last commit and discard changes
             </div>
         </div>
     </div>
-        
+    
     <div class="content-grid">
         <div class="card">
-            <h3>Rebasing</h3>
+            <h3>Rebase</h3>
             <div class="command-box">
                 <div class="command">git rebase -i master</div> - Interactively rebase the current branch onto <code>master</code>, allowing you to edit, combine, or remove commits.<br>
                 <ol>
-                <li>p, pick   = use commit as is</li>
-                <li>r, reword = use commit, but edit the commit message</li>
-                <li>e, edit   = use commit, but pause for amending</li>
-                <li>s, squash = combine commit into the previous one (keep both messages)</li>
-                <li>f, fixup  = combine commit into the previous one (discard this commit's message)</li>
-                <li>x, exec   = run shell command during rebase</li>
-                <li>d, drop   = remove commit entirely</li>
+                    <li>p, pick   = use commit as is</li>
+                    <li>r, reword = use commit, but edit the commit message</li>
+                    <li>e, edit   = use commit, but pause for amending</li>
+                    <li>s, squash = combine commit into the previous one (keep both messages)</li>
+                    <li>f, fixup  = combine commit into the previous one (discard this commit's message)</li>
+                    <li>x, exec   = run a shell command during rebase</li>
+                    <li>d, drop   = remove commit entirely</li>
                 </ol>
             </div>
         </div>
+        <div class="card">
+            <h3>Bisect</h3>
+            <div class="command-box">
+                <div class="command">git bisect</div> - Start binary search to find a bug<br>
+                <div class="command">git bisect start</div> - Begin the bisect session<br>
+                <div class="command">git bisect bad</div> - Mark current commit as bad<br>
+                <div class="command">git bisect good &lt;commit-hash&gt;</div> - Mark a known good commit<br>
+                <div class="command">git bisect run &lt;script_name&gt;</div> - Automate testing with a script<br>
+                <div class="command">git bisect reset</div> - End bisect and return to original state<br>
+            </div>
+        </div>
     </div>
-</div>
 
+    <div class="content-grid">
+        <div class="card">
+            <h3>Filter Repo</h3>
+            <div class="command-box">
+                <div class="command">git install git-filter-repo</div> - Install filter-repo tool<br>
+                <div class="command">git filter-repo --path secret.txt --invert-paths</div> - Remove specific file from history<br>
+                <div class="command">git filter-repo --path config.ini --invert-paths --force</div> - Force remove file from history<br>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Reflog</h3>
+            <div class="command-box">
+                <div class="command">git reflog</div> - Show reference log<br>
+                <div class="command">git reflog show</div> - Show reflog details<br>
+                <div class="command">git reflog expire</div> - Clean up old reflog entries<br>
+                <div class="command">git reflog --since</div> - Show reflog entries since a given time<br>
+                <div class="command">git reflog --until</div> - Show reflog entries until a given time<br>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="card">
+            <h3>Worktree</h3>
+            <div class="command-box">
+                <div class="command">git worktree</div> - Manage multiple working directories<br>
+                <div class="command">git worktree add &lt;path&gt; &lt;branch&gt;</div> - Create a new working tree at a path for a branch<br>
+                <div class="command">git worktree list</div> - Show all linked working trees<br>
+                <div class="command">git worktree remove &lt;path&gt;</div> - Remove a working tree<br>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Git Submodule</h3>
+                <div class="command-box">
+                <div class="command">git submodule</div> - Manage submodules<br>
+                <div class="command">git submodule add &lt;repository link | dir&gt; &lt;path&gt;</div> - Add a new submodule<br>
+                <div class="command">git submodule list</div> - Show submodules<br>
+                <div class="command">git submodule status</div> - Show the status (commit + sync state) of submodules <br>
+                <div class="command">git submodule update --init</div> - Initialize and fetch submodules<br>
+                <div class="command">git submodule update --init --recursive</div> - Initialize and update all nested submodules<br>
+                <div class="command">git submodule update --init &lt;path_to_submodule&gt;</div> - Init & update specific submodule<br>
+                <div class="command">git submodule deinit &lt;submodule_name&gt;</div> - Unregister a submodule<br>
+                <div class="command">git rm &lt;path&gt;</div> - Remove a submodule from repo<br>
+            </div>
+        </div>
+    </div>
+    
         <div id="exercises" class="section">
             <h2>Practice Exercises</h2>
             
